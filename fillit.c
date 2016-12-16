@@ -6,7 +6,7 @@
 /*   By: tpasqual <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/12/01 08:39:27 by tpasqual          #+#    #+#             */
-/*   Updated: 2016/12/15 17:41:34 by tpasqual         ###   ########.fr       */
+/*   Updated: 2016/12/16 17:53:27 by tpasqual         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,13 @@
 
 
 // Checks if we have 6 or 8 connections to validate the tetrimino
+
+void	ft_putnbr_bn(int i)
+{
+	ft_putchar('\n');
+	ft_putnbr(i);
+	ft_putchar('\n');
+}
 
 int		check_contigous(char *str)
 {
@@ -88,7 +95,7 @@ t_point	*ft_memo_tetra(char *str, char letter)
 	t_point		*points;
 	//	t_listf		*listf;
 
-	i = 1;
+	i = 0;
 	y = 0;
 	my = 0;
 	nbcar = 1;
@@ -205,8 +212,6 @@ void	ft_print_list(t_point *tmp)
 {
 	t_point	*point;
 
-	if (!tmp)
-		ft_putstr("kokoko");
 	while (tmp->next != NULL)
 	{
 		point = tmp;
@@ -315,38 +320,83 @@ char 	**ft_greater_grid(char **grid, int dim)
 		ft_memcpy(new_grid[i], grid[i], dim - 1);
 		i++;
 	}
-		
-
 	return(new_grid);
 }
 
-void 	ft_testrec(char **grid, t_point *debut, int dim)
+int		ft_check_borders(t_point *debut, int col, int lig, int dim)
 {
-	int 	i;
-	int 	j;
+	int		ret;
 
-	i = 0;
-	j = 0;
-	while (i < dim)
+	//ft_putchar('@');ft_putnbr(col);ft_putnbr(lig);ft_putchar('\n');
+	if (col + debut->x2 < 0 || col + debut->x3 < 0 || col + debut->x4 < 0)
+		return (1);
+	if (col + debut->x2 > dim || col + debut->x3 > dim || col + debut->x4 > dim)
+		return (2);
+	if (lig + debut->y2 > dim || lig + debut->y3 > dim || lig + debut->y4 > dim)
+		return (3);
+	//return (0):  les coordonnees de la piece sont dans les limites de grid
+	return (0);
+}
+
+int 	ft_insert_part(char **grid, t_point *debut, int dim)
+{
+	int		col;
+	int		lig;
+	int		ret;
+
+	col = 0;
+	lig = 0;
+	ret = 1;
+	while (lig < dim)
 	{
-		while (j < dim)
+		while (col < dim)
 		{
-			if (debut->next != NULL)	
-			{	
-				ft_testrec(grid, debut->next, dim);
-				grid[i][j] = debut->letter;
-				ft_putchar(debut->letter);
-				ft_putchar('<');
-				ft_putnbr(i);
-				ft_putchar('-');
-				ft_putnbr(j);
-				ft_putchar('>');
-				ft_putchar('\n');
+			//ft_putchar('=');ft_putnbr(col);ft_putnbr(lig);ft_putchar('\n');
+			if(grid[lig][col] == '.')
+			{
+				ret = ft_check_borders(debut, col, lig, dim);
+	//			ft_putstr("Retour check_border: ");ft_putnbr(ret);ft_putchar('\n');
+				// si ret = 0 : on peut tester si les cases de la grid correspondant au xi, yj sont libres.
+				if (ret == 0)
+				{
+					if (grid[lig + debut->y2][col + debut->x2] == '.' &&
+						grid[lig + debut->y3][col + debut->x3] == '.' &&
+				   		grid[lig + debut->y4][col + debut->x4] == '.')
+					{
+						grid[lig][col] = debut->letter;
+						grid[lig + debut->y2][col + debut->x2] = debut->letter;
+						grid[lig + debut->y3][col + debut->x3] = debut->letter;
+						grid[lig + debut->y4][col + debut->x4] = debut->letter;
+						return (0);
+					}
+				}
 			}
-			j++;
+			col++;
 		}
-		j = 0;
-		i++;
+		col = 0;
+		lig++;
+	}	
+	return (1);
+}
+
+void 	ft_place_parts(char **grid, t_point *debut, int dim)
+{
+	int		ret;
+	char	**new_grid;
+
+	while (debut->next != NULL)	
+	{	
+		ret = ft_insert_part(grid, debut, dim);
+
+		debut = debut->next;
+	}
+	ret = ft_insert_part(grid, debut, dim);
+	if (ret == 1)
+	{
+		new_grid = ft_greater_grid(grid, dim + 1);
+		free(*grid);
+		*grid = *new_grid;
+		ret = ft_insert_part(grid, debut, dim + 1);
 	}
 }
 
@@ -377,13 +427,15 @@ int		main(int argc, char **argv)
 		ft_putstr("error\n");
 		return (1);
 	}
-	ft_print_list(debut);
+	//ft_print_list(debut);
 	list_size = ft_list_size(debut);
 	dim = ft_dim_grid(list_size);
 	grid = ft_create_grid(dim);
-//	ft_print_grid(grid, dim);
-//	ft_putstr("-------------");
-	ft_testrec(grid, debut, dim);
+	dim--;
+	ft_putnbr_bn(dim);
+	ft_place_parts(grid, debut, dim);
+	ft_putchar('\n');
+	ft_print_grid(grid, dim + 1);
 	return (0);
 }
 
