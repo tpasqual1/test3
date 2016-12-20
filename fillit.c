@@ -6,18 +6,14 @@
 /*   By: tpasqual <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/12/01 08:39:27 by tpasqual          #+#    #+#             */
-/*   Updated: 2016/12/20 12:16:57 by tpasqual         ###   ########.fr       */
+/*   Updated: 2016/12/20 16:55:35 by tpasqual         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-
 
 #include <stdio.h>
 #include <fcntl.h>
 #include "fillit.h"
 #include "libft.h"
-
-
-// Checks if we have 6 or 8 connections to validate the tetrimino
 
 void	ft_putnbr_bn(int i)
 {
@@ -51,8 +47,6 @@ int		check_contigous(char *str)
 	return (block == 6 || block == 8);
 }
 
-// Check characters counter to validate the piece.
-
 int		check_counts(char *str, int count)
 {
 	int i;
@@ -67,78 +61,70 @@ int		check_counts(char *str, int count)
 			if (str[i] != '#' && str[i] != '.')
 				return (-1);
 			if (str[i] == '#')
-			{	
+			{
 				carok++;
 				if (carok > 4)
 					return (-1);
-			}	
+			}
 		}
 		else if (str[i] != '\n')
 			return (-1);
 		i++;
 	}
-	if (count == 21 && str[20] != '\n' )
-		return (-1);
-	if (!check_contigous(str))
+	if ((count == 21 && str[20] != '\n') || !check_contigous(str))
 		return (-1);
 	return (0);
 }
 
-t_point	*ft_memo_tetra(char *str, char letter) 
+void			ft_set_tetra(t_point *points, int nblk, int i, int y)
 {
-	int			i;
-	int			nbcar;
 	int			mx;
 	int			my;
-	int			x;	
-	int			y;
-	t_point		*points;
-	//	t_listf		*listf;
+	t_point		*ppoints;
+
+	mx = 0;
+	my = 0;
+	ppoints = points;
+	ppoints->x1 = (nblk == 1) ? 0 : ppoints->x1;
+	ppoints->y1 = (nblk == 1) ? 0 : ppoints->y1;
+	mx = (nblk == 1) ? i % 5 : mx;
+	my = (nblk == 1) ? y : my;
+	ppoints->x2 = (nblk == 2) ? (i % 5) - mx : ppoints->x2;
+	ppoints->y2 = (nblk == 2) ? y - my : ppoints->y2;
+	ppoints->x3 = (nblk == 3) ? (i % 5) - mx : ppoints->x3;
+	ppoints->y3 = (nblk == 3) ? y - my : ppoints->y3;
+	ppoints->x4 = (nblk == 4) ? (i % 5) - mx : ppoints->x4;
+	ppoints->y4 = (nblk == 4) ? y - my : ppoints->y4;
+}
+
+t_point				*ft_memo_tetra(char *str, char letter)
+{
+	int				i;
+	int				nbcar;
+	int				x;
+	int				y;
+	t_point			*points;
 
 	i = 0;
 	y = 0;
-	my = 0;
 	nbcar = 1;
 	points = malloc(sizeof(t_point));
-	while (i < 21)		
-	{  
+	while (i < 21)
+	{
 		if (str[i] == '#')
-		{
-			if (nbcar == 1)
-			{
-				points->x1 = 0;
-				points->y1 = 0;
-				mx = i % 5;
-				my = y;
-			}
-			if (nbcar == 2)
-			{
-				points->x2 = (i % 5) - mx;
-				points->y2 = y - my;
-			}			
-			if (nbcar == 3)
-			{
-				points->x3 = (i % 5) - mx;
-				points->y3 = y - my;
-			}			
-			if (nbcar == 4)
-			{
-				points->x4 = (i % 5) - mx;
-				points->y4 = y - my;
-			}			
-			nbcar++;
-		}
-		else if (str[i] == '\n')
+			ft_set_tetra(points, nbcar, i, y);
+		nbcar = nbcar + ((str[i] == '#') ? 1 : 0);
+		if (str[i] == '\n')
 			y++;
 		i++;
 	}
 	points->prev = NULL;
 	points->next = NULL;
-	points->letter = letter ;
+	points->letter = letter;
 	return (points);
 }
 
-int		ft_sqrt(float a)
+int			ft_sqrt(float a)
 {
 	float	c;
 	int		n;
@@ -169,7 +155,7 @@ int		ft_list_size(t_point *debut)
 	return (i);
 }
 
-void	ft_lstadd_point(t_point *point, t_point *debut)
+void		ft_lstadd_point(t_point *point, t_point *debut)
 {
 	t_point	*temp;
 
@@ -183,27 +169,19 @@ void	ft_lstadd_point(t_point *point, t_point *debut)
 	point->prev = temp;
 }
 
-// Read tetriminos and fill in  a list.
-
-t_point	*read_tetri(int fd)
+t_point			*ft_process_a_tetra(int fd, int count, char *buf)
 {
-	char		*buf;
-	int			count;
-	int			res_count;
 	int			letter;
 	t_point		*debut;
 	t_point		*point;
 
 	debut = NULL;
 	letter = 65;
-	buf = ft_strnew(21);
-	count = read(fd, buf, 21);
 	while (count >= 20)
 	{
 		if (check_counts(buf, count) != 0)
 			return (NULL);
-		//On a ici un tetraminos valide a stocker dans une liste 
-		point = ft_memo_tetra(buf, letter);	
+		point = ft_memo_tetra(buf, letter);
 		if (debut == NULL)
 		{
 			debut = point;
@@ -218,66 +196,30 @@ t_point	*read_tetri(int fd)
 	return (debut);
 }
 
-
-void	ft_print_list(t_point *tmp)
+t_point			*read_tetri(int fd)
 {
-	t_point	*point;
+	char		*buf;
+	int			count;
+	t_point		*debut;
 
-	while (tmp->next != NULL)
-	{
-		point = tmp;
-		ft_putchar(point->letter);
-		ft_putchar('\n');
-		ft_putnbr(point->x1);
-		ft_putchar(',');
-		ft_putnbr(point->y1);
-		ft_putchar('\n');
-		ft_putnbr(point->x2);
-		ft_putchar(',');
-		ft_putnbr(point->y2);
-		ft_putchar('\n');
-		ft_putnbr(point->x3);
-		ft_putchar(',');
-		ft_putnbr(point->y3);
-		ft_putchar('\n');
-		ft_putnbr(point->x4);
-		ft_putchar(',');
-		ft_putnbr(point->y4);
-		ft_putchar('\n');
-		tmp = tmp->next;
-	}
-	point = tmp;
-	ft_putchar(point->letter);
-	ft_putchar('\n');
-	ft_putnbr(point->x1);
-	ft_putchar(',');
-	ft_putnbr(point->y1);
-	ft_putchar('\n');
-	ft_putnbr(point->x2);
-	ft_putchar(',');
-	ft_putnbr(point->y2);
-	ft_putchar('\n');
-	ft_putnbr(point->x3);
-	ft_putchar(',');
-	ft_putnbr(point->y3);
-	ft_putchar('\n');
-	ft_putnbr(point->x4);
-	ft_putchar(',');
-	ft_putnbr(point->y4);
-	ft_putchar('\n');
+	debut = NULL;
+	buf = ft_strnew(21);
+	count = read(fd, buf, 21);
+	debut = ft_process_a_tetra(fd, count, buf);
+	return (debut);
 }
 
-int		ft_dim_grid(int list_size)
+int			ft_dim_grid(int list_size)
 {
- 	int		i;
+	int		i;
 
 	i = ft_sqrt(list_size * 4);
 	if (i * i < list_size * 4)
 		i = i + 1;
-	return(i);
+	return (i);
 }
 
-char	**ft_create_grid(int dim)
+char		**ft_create_grid(int dim)
 {
 	char	**grid;
 	int		i;
@@ -289,7 +231,7 @@ char	**ft_create_grid(int dim)
 	{
 		grid[i] = (char *)malloc(sizeof(char) * dim);
 		i++;
-	}	
+	}
 	i = 0;
 	while (i < dim)
 	{
@@ -297,14 +239,14 @@ char	**ft_create_grid(int dim)
 		while (j < dim)
 		{
 			grid[i][j] = '.';
-			j++;	
-		}	
-		i++;	
+			j++;
+		}
+		i++;
 	}
 	return (grid);
 }
 
-void	ft_print_grid(char **grid, int dim)
+void		ft_print_grid(char **grid, int dim)
 {
 	int		i;
 
@@ -317,10 +259,10 @@ void	ft_print_grid(char **grid, int dim)
 	}
 }
 
-void	ft_greater_grid(char ***grid, int dim)
+void		ft_greater_grid(char ***grid, int dim)
 {
 	char	**new_grid;
-	int i;
+	int		i;
 
 	i = 0;
 	new_grid = (char **)malloc(sizeof(char *) * dim);
@@ -330,7 +272,7 @@ void	ft_greater_grid(char ***grid, int dim)
 		ft_memset(new_grid[i], 46, dim);
 		i++;
 	}
-	i = 0;	
+	i = 0;
 	while (i < dim - 1)
 	{
 		free((*grid)[i]);
@@ -339,7 +281,7 @@ void	ft_greater_grid(char ***grid, int dim)
 	*grid = new_grid;
 }
 
-int		ft_check_borders(t_point *debut, int col, int lig, int dim)
+int			ft_check_borders(t_point *debut, int col, int lig, int dim)
 {
 	int		ret;
 
@@ -347,18 +289,15 @@ int		ft_check_borders(t_point *debut, int col, int lig, int dim)
 		return (1);
 	if (col + debut->x2 > dim || col + debut->x3 > dim || col + debut->x4 > dim)
 		return (2);
-	if (lig + debut->y2 > dim -1 || lig + debut->y3 > dim -1 || lig + debut->y4 > dim -1)
+	if (lig + debut->y2 > dim - 1 || lig + debut->y3 > dim - 1 ||
+			lig + debut->y4 > dim - 1)
 		return (3);
-	//return (0):  les coordonnees de la piece sont dans les limites de grid
 	return (0);
 }
 
-int     ft_copy_part(char **grid, t_point *debut, int col, int lig, int dim)
+int			ft_copy_part(char **grid, t_point *debut, int col, int lig)
 {
-	int ret;
-
-	ret = ft_check_borders(debut, col, lig, dim);
-	if (grid[lig][col] == '.' && ret == 0)
+	if (grid[lig][col] == '.')
 	{
 		if (grid[lig + debut->y2][col + debut->x2] == '.' &&
 				grid[lig + debut->y3][col + debut->x3] == '.' &&
@@ -374,7 +313,7 @@ int     ft_copy_part(char **grid, t_point *debut, int col, int lig, int dim)
 	return (1);
 }
 
-int     ft_del_part(char **grid, t_point *debut, int col, int lig)
+int		ft_del_part(char **grid, t_point *debut, int col, int lig)
 {
 	grid[lig][col] = '.';
 	grid[lig + debut->y2][col + debut->x2] = '.';
@@ -383,33 +322,27 @@ int     ft_del_part(char **grid, t_point *debut, int col, int lig)
 	return (0);
 }
 
-int     ft_insert_part(char **grid, t_point *debut, int dim)
+int			ft_insert_part(char **grid, t_point *debut, int dim)
 {
-	int     col;
-	int     lig;
-	int     ret;
+	int		col;
+	int		lig;
 
 	col = 0;
 	lig = 0;
-	ret = 1;
 	if (debut == NULL)
 		return (0);
-
 	while (lig < dim)
 	{
 		while (col < dim)
 		{
-			if (ft_copy_part(grid, debut, col, lig, dim) == 0)
-			{	
-				if (ft_insert_part(grid, debut->next, dim) == 0)
-				{	
-					return (0);
-				}
-				else
+			if (ft_check_borders(debut, col, lig, dim) == 0)
+				if (ft_copy_part(grid, debut, col, lig) == 0)
 				{
-					ft_del_part(grid, debut, col, lig);
+					if (ft_insert_part(grid, debut->next, dim) == 0)
+						return (0);
+					else
+						ft_del_part(grid, debut, col, lig);
 				}
-			}
 			col++;
 		}
 		col = 0;
@@ -418,23 +351,29 @@ int     ft_insert_part(char **grid, t_point *debut, int dim)
 	return (1);
 }
 
-int 	ft_place_parts(char ***grid, t_point *debut, int dim)
+int			ft_place_parts(char ***grid, t_point *debut, int dim)
 {
 	int		ret;
 	int		dm;
 
 	dm = dim;
-	ret = ft_insert_part(*grid, debut, dm);	
-	if (ret != 0 )	
-	{	
+	ret = ft_insert_part(*grid, debut, dm);
+	if (ret != 0)
+	{
 		dm++;
 		ft_greater_grid(grid, dm);
-		ft_place_parts(grid, debut, dim);	
+		ft_place_parts(grid, debut, dim);
 	}
 	return (dm);
 }
 
-int		main(int argc, char **argv)
+void	ft_error_exit(char *str)
+{
+	ft_putstr(str);
+	exit(1);
+}
+
+int				main(int argc, char **argv)
 {
 	int			list_size;
 	int			fd;
@@ -444,27 +383,17 @@ int		main(int argc, char **argv)
 
 	debut = NULL;
 	list_size = 0;
-
 	if (argc != 2)
-	{
-		ft_putstr("usage: fillit input_file\n");
-		return (1);
-	}
+		ft_error_exit("usage: fillit input_file\n");
 	if ((fd = open(argv[1], O_RDONLY)) < 0)
-	{
-		ft_putstr("error\n");
-		return (1);
-	}
+		ft_error_exit("error\n");
 	debut = read_tetri(fd);
 	if (debut == NULL)
-	{
-		ft_putstr("error\n");
-		return (1);
-	}
+		ft_error_exit("error\n");
 	list_size = ft_list_size(debut);
 	dim = ft_dim_grid(list_size);
 	grid = ft_create_grid(dim);
-	dim=ft_place_parts(&grid, debut, dim);
+	dim = ft_place_parts(&grid, debut, dim);
 	ft_print_grid(grid, dim);
 	return (0);
 }
