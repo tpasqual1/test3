@@ -6,7 +6,7 @@
 /*   By: tpasqual <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/12/01 08:39:27 by tpasqual          #+#    #+#             */
-/*   Updated: 2016/12/20 16:55:35 by tpasqual         ###   ########.fr       */
+/*   Updated: 2016/12/20 18:28:57 by tpasqual         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,25 +76,30 @@ int		check_counts(char *str, int count)
 	return (0);
 }
 
-void			ft_set_tetra(t_point *points, int nblk, int i, int y)
+void			ft_set_tetra(t_point *points, int nbcar, int i, int y)
 {
-	int			mx;
-	int			my;
-	t_point		*ppoints;
-
-	mx = 0;
-	my = 0;
-	ppoints = points;
-	ppoints->x1 = (nblk == 1) ? 0 : ppoints->x1;
-	ppoints->y1 = (nblk == 1) ? 0 : ppoints->y1;
-	mx = (nblk == 1) ? i % 5 : mx;
-	my = (nblk == 1) ? y : my;
-	ppoints->x2 = (nblk == 2) ? (i % 5) - mx : ppoints->x2;
-	ppoints->y2 = (nblk == 2) ? y - my : ppoints->y2;
-	ppoints->x3 = (nblk == 3) ? (i % 5) - mx : ppoints->x3;
-	ppoints->y3 = (nblk == 3) ? y - my : ppoints->y3;
-	ppoints->x4 = (nblk == 4) ? (i % 5) - mx : ppoints->x4;
-	ppoints->y4 = (nblk == 4) ? y - my : ppoints->y4;
+	if (nbcar == 1)
+	{
+		points->x1 = i % 5;
+		points->y1 = y;
+	}
+	if (nbcar == 2)
+	{
+		points->x2 = (i % 5) - points->x1;
+		points->y2 = y - points->y1;
+	}
+	if (nbcar == 3)
+	{
+		points->x3 = (i % 5) - points->x1;
+		points->y3 = y - points->y1;
+	}
+	if (nbcar == 4)
+	{
+		points->x4 = (i % 5) - points->x1;
+		points->y4 = y - points->y1;
+		points->x1 = 0;
+		points->y1 = 0;
+	}
 }
 
 t_point				*ft_memo_tetra(char *str, char letter)
@@ -358,11 +363,11 @@ int			ft_place_parts(char ***grid, t_point *debut, int dim)
 
 	dm = dim;
 	ret = ft_insert_part(*grid, debut, dm);
-	if (ret != 0)
+	while (ret != 0)
 	{
 		dm++;
 		ft_greater_grid(grid, dm);
-		ft_place_parts(grid, debut, dim);
+		ret = ft_insert_part(*grid, debut, dm);
 	}
 	return (dm);
 }
@@ -392,6 +397,8 @@ int				main(int argc, char **argv)
 		ft_error_exit("error\n");
 	list_size = ft_list_size(debut);
 	dim = ft_dim_grid(list_size);
+	if (list_size > 26)
+		ft_error_exit("error\n");
 	grid = ft_create_grid(dim);
 	dim = ft_place_parts(&grid, debut, dim);
 	ft_print_grid(grid, dim);
