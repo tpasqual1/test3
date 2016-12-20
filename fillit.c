@@ -6,7 +6,7 @@
 /*   By: tpasqual <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/12/01 08:39:27 by tpasqual          #+#    #+#             */
-/*   Updated: 2016/12/19 20:03:27 by tpasqual         ###   ########.fr       */
+/*   Updated: 2016/12/20 12:16:57 by tpasqual         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,7 +77,7 @@ int		check_counts(char *str, int count)
 			return (-1);
 		i++;
 	}
-	if (count == 21 && str[20] != '\n')
+	if (count == 21 && str[20] != '\n' )
 		return (-1);
 	if (!check_contigous(str))
 		return (-1);
@@ -269,8 +269,12 @@ void	ft_print_list(t_point *tmp)
 
 int		ft_dim_grid(int list_size)
 {
-	return(3);
-	//return(ft_sqrt(list_size * 4) + 1);
+ 	int		i;
+
+	i = ft_sqrt(list_size * 4);
+	if (i * i < list_size * 4)
+		i = i + 1;
+	return(i);
 }
 
 char	**ft_create_grid(int dim)
@@ -329,31 +333,16 @@ void	ft_greater_grid(char ***grid, int dim)
 	i = 0;	
 	while (i < dim - 1)
 	{
-//		ft_memcpy(new_grid[i], (*grid)[i], dim - 1);
 		free((*grid)[i]);
-	//	grid[i] = new_grid[i];
 		i++;
 	}
 	*grid = new_grid;
-	ft_print_grid(*grid, dim);
 }
 
 int		ft_check_borders(t_point *debut, int col, int lig, int dim)
 {
 	int		ret;
 
-//	ft_putchar('\n');
-//	ft_putstr("CheckBorder Col:");ft_putnbr(col);ft_putchar('\n');
-//	ft_putstr("CheckBorder Lig:");ft_putnbr(lig);ft_putchar('\n');
-//	ft_putstr("CheckBorder Dim:");ft_putnbr(dim);ft_putchar('\n');
-//	ft_putstr("CheckBorder letter:");ft_putchar(debut->letter);ft_putchar('\n');
-//	ft_putstr("CheckBorder x2:");ft_putnbr(debut->x2);ft_putchar('\n');
-//	ft_putstr("CheckBorder y2:");ft_putnbr(debut->y2);ft_putchar('\n');
-//	ft_putstr("CheckBorder x3:");ft_putnbr(debut->x3);ft_putchar('\n');
-//	ft_putstr("CheckBorder y3:");ft_putnbr(debut->y3);ft_putchar('\n');
-//	ft_putstr("CheckBorder x4:");ft_putnbr(debut->x4);ft_putchar('\n');
-//	ft_putstr("CheckBorder y4:");ft_putnbr(debut->y4);ft_putchar('\n');
-//	ft_putchar('\n');
 	if (col + debut->x2 < 0 || col + debut->x3 < 0 || col + debut->x4 < 0)
 		return (1);
 	if (col + debut->x2 > dim || col + debut->x3 > dim || col + debut->x4 > dim)
@@ -369,16 +358,8 @@ int     ft_copy_part(char **grid, t_point *debut, int col, int lig, int dim)
 	int ret;
 
 	ret = ft_check_borders(debut, col, lig, dim);
-//	ft_print_grid(grid, dim);
-//	ft_putnbr(lig);ft_putnbr(col);ft_putchar(grid[lig][col]);ft_putnbr(ret);ft_putchar('\n');
 	if (grid[lig][col] == '.' && ret == 0)
 	{
-//		ft_putchar('<');
-//		ft_putchar(grid[lig + debut->y2][col + debut->x2]);
-//		ft_putchar(grid[lig + debut->y3][col + debut->x3]);
-//		ft_putchar(grid[lig + debut->y4][col + debut->x4]);
-//		ft_putchar('>');
-//		ft_putchar('\n');
 		if (grid[lig + debut->y2][col + debut->x2] == '.' &&
 				grid[lig + debut->y3][col + debut->x3] == '.' &&
 				grid[lig + debut->y4][col + debut->x4] == '.')
@@ -411,12 +392,9 @@ int     ft_insert_part(char **grid, t_point *debut, int dim)
 	col = 0;
 	lig = 0;
 	ret = 1;
-
-//	ft_putchar(debut->letter);ft_putchar('\n');
 	if (debut == NULL)
-	{
 		return (0);
-	}
+
 	while (lig < dim)
 	{
 		while (col < dim)
@@ -425,39 +403,33 @@ int     ft_insert_part(char **grid, t_point *debut, int dim)
 			{	
 				if (ft_insert_part(grid, debut->next, dim) == 0)
 				{	
-					ft_putstr("return 0\n");
 					return (0);
 				}
 				else
+				{
 					ft_del_part(grid, debut, col, lig);
+				}
 			}
 			col++;
 		}
 		col = 0;
 		lig++;
 	}
-//	ft_putstr("return 1\n");
 	return (1);
 }
 
-int 	ft_place_parts(char **grid, t_point *debut, int dim)
+int 	ft_place_parts(char ***grid, t_point *debut, int dim)
 {
 	int		ret;
 	int		dm;
 
 	dm = dim;
-	ft_putnbr(dm);
-	ret = ft_insert_part(grid, debut, dm);	
-	ft_putchar('\n');
-	ft_putnbr(ret);
-	ft_putstr(" PREEEEEE AGRANDISSEMENT");
-	while (ret != 0 )	
+	ret = ft_insert_part(*grid, debut, dm);	
+	if (ret != 0 )	
 	{	
-		ft_putstr("AGRANDISSEMENT");
-		ft_putnbr(ret);
-		ft_putchar('\n');
-		ft_greater_grid(&grid, ++dm);
-		ret = ft_insert_part(grid, debut, dm);	
+		dm++;
+		ft_greater_grid(grid, dm);
+		ft_place_parts(grid, debut, dim);	
 	}
 	return (dm);
 }
@@ -489,15 +461,10 @@ int		main(int argc, char **argv)
 		ft_putstr("error\n");
 		return (1);
 	}
-	//ft_print_list(debut);
 	list_size = ft_list_size(debut);
 	dim = ft_dim_grid(list_size);
 	grid = ft_create_grid(dim);
-//	dim--;
-	ft_putnbr_bn(dim);
-	dim=ft_place_parts(grid, debut, dim);
-	ft_putchar('\n');
+	dim=ft_place_parts(&grid, debut, dim);
 	ft_print_grid(grid, dim);
 	return (0);
 }
-
