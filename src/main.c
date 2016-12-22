@@ -6,13 +6,13 @@
 /*   By: tpasqual <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/12/01 08:39:27 by tpasqual          #+#    #+#             */
-/*   Updated: 2016/12/21 10:55:31 by tpasqual         ###   ########.fr       */
+/*   Updated: 2016/12/22 11:46:52 by tpasqual         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "fillit.h"
 
-void	ft_error_exit(char *str)
+void			ft_error_exit(char *str)
 {
 	ft_putstr(str);
 	exit(1);

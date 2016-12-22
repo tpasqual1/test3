@@ -6,7 +6,7 @@
 #    By: tpasqual <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2016/11/07 19:36:40 by tpasqual          #+#    #+#              #
-#    Updated: 2016/12/21 12:05:30 by tpasqual         ###   ########.fr        #
+#    Updated: 2016/12/22 12:10:26 by tpasqual         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -18,6 +18,7 @@ SRC_NAME = 	main.c\
 			insert_part.c\
 			linked_list.c\
 			process_grid.c
+LIBFT = libft.a
 
 OBJ = $(SRC_NAME:.c=.o)
 

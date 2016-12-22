@@ -6,7 +6,7 @@
 /*   By: tpasqual <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/12/01 08:39:27 by tpasqual          #+#    #+#             */
-/*   Updated: 2016/12/21 11:04:34 by tpasqual         ###   ########.fr       */
+/*   Updated: 2016/12/22 11:46:23 by tpasqual         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,7 @@ int			ft_copy_part(char **grid, t_point *debut, int col, int lig)
 	return (1);
 }
 
-int		ft_del_part(char **grid, t_point *debut, int col, int lig)
+int			ft_del_part(char **grid, t_point *debut, int col, int lig)
 {
 	grid[lig][col] = '.';
 	grid[lig + debut->y2][col + debut->x2] = '.';

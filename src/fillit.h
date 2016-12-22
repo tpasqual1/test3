@@ -6,15 +6,15 @@
 /*   By: tpasqual <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/12/01 08:39:27 by tpasqual          #+#    #+#             */
-/*   Updated: 2016/12/21 10:56:14 by tpasqual         ###   ########.fr       */
+/*   Updated: 2016/12/22 09:23:24 by tpasqual         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef FILLIT_H
 # define FILLIT_H
 # include <string.h>
-#include <stdio.h>
-#include <fcntl.h>
+# include <stdio.h>
+# include <fcntl.h>
 # include "libft.h"
 
 typedef struct		s_point

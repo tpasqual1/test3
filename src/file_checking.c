@@ -6,16 +6,16 @@
 /*   By: tpasqual <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/12/01 08:39:27 by tpasqual          #+#    #+#             */
-/*   Updated: 2016/12/21 11:04:15 by tpasqual         ###   ########.fr       */
+/*   Updated: 2016/12/22 11:43:54 by tpasqual         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "fillit.h"
 
-int		check_contigous(char *str)
+int			check_contigous(char *str)
 {
-	int block;
-	int i;
+	int		block;
+	int		i;
 
 	block = 0;
 	i = 0;
@@ -37,10 +37,10 @@ int		check_contigous(char *str)
 	return (block == 6 || block == 8);
 }
 
-int		check_counts(char *str, int count)
+int			check_counts(char *str, int count)
 {
-	int i;
-	int carok;
+	int		i;
+	int		carok;
 
 	i = 0;
 	carok = 0;
@@ -66,7 +66,7 @@ int		check_counts(char *str, int count)
 	return (0);
 }
 
-void			ft_set_tetra(t_point *points, int nbcar, int i, int y)
+void		ft_set_tetra(t_point *points, int nbcar, int i, int y)
 {
 	if (nbcar == 1)
 	{
@@ -92,12 +92,12 @@ void			ft_set_tetra(t_point *points, int nbcar, int i, int y)
 	}
 }
 
-t_point				*ft_memo_tetra(char *str, char letter)
+t_point		*ft_memo_tetra(char *str, char letter)
 {
-	int				i;
-	int				nbcar;
-	int				y;
-	t_point			*points;
+	int		i;
+	int		nbcar;
+	int		y;
+	t_point	*points;
 
 	i = 0;
 	y = 0;

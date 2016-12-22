@@ -6,17 +6,17 @@
 /*   By: tpasqual <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/12/01 08:39:27 by tpasqual          #+#    #+#             */
-/*   Updated: 2016/12/21 10:46:52 by tpasqual         ###   ########.fr       */
+/*   Updated: 2016/12/22 11:45:48 by tpasqual         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "fillit.h"
 
-int			ft_sqrt(float a)
+int				ft_sqrt(float a)
 {
-	float	c;
-	int		n;
-	int		compteur;
+	float		c;
+	int			n;
+	int			compteur;
 
 	compteur = 1;
 	c = 1;
@@ -30,9 +30,9 @@ int			ft_sqrt(float a)
 	return (compteur);
 }
 
-int		ft_list_size(t_point *debut)
+int				ft_list_size(t_point *debut)
 {
-	int	i;
+	int			i;
 
 	i = 1;
 	while (debut->next != NULL)
@@ -43,9 +43,9 @@ int		ft_list_size(t_point *debut)
 	return (i);
 }
 
-void		ft_lstadd_point(t_point *point, t_point *debut)
+void			ft_lstadd_point(t_point *point, t_point *debut)
 {
-	t_point	*temp;
+	t_point		*temp;
 
 	temp = debut;
 	while (debut->next != NULL)
@@ -60,6 +60,7 @@ void		ft_lstadd_point(t_point *point, t_point *debut)
 t_point			*ft_process_a_tetra(int fd, int count, char *buf)
 {
 	int			letter;
+	int			memo_count;
 	t_point		*debut;
 	t_point		*point;
 
@@ -67,13 +68,13 @@ t_point			*ft_process_a_tetra(int fd, int count, char *buf)
 	letter = 65;
 	while (count >= 20)
 	{
+		memo_count = count;
 		if (check_counts(buf, count) != 0)
 			return (NULL);
 		point = ft_memo_tetra(buf, letter);
 		if (debut == NULL)
 		{
 			debut = point;
-			debut->prev = NULL;
 			debut->next = NULL;
 		}
 		else
@@ -81,7 +82,7 @@ t_point			*ft_process_a_tetra(int fd, int count, char *buf)
 		count = read(fd, buf, 21);
 		letter++;
 	}
-	return (debut);
+	return ((count != 0 || memo_count == 21) ? NULL : debut);
 }
 
 t_point			*read_tetri(int fd)
