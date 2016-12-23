@@ -6,51 +6,35 @@
 #    By: tpasqual <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2016/11/07 19:36:40 by tpasqual          #+#    #+#              #
-#    Updated: 2016/12/23 09:00:25 by tpasqual         ###   ########.fr        #
+#    Updated: 2016/12/23 13:53:27 by tpasqual         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-NAME	= fillit 
+NAME = fillit
+SRC = ./src
+INC = ./includes
+OBJ = .
+LIST_SRC = $(SRC)/main.c $(SRC)/file_checking.c $(SRC)/insert_part.c\
+		   $(SRC)/linked_list.c $(SRC)/process_grid.c
 
-SRC		= main.c\
-		  file_checking.c\
-		  insert_part.c\
-		  linked_list.c\
-		  process_grid.c
+LIST_OBJ = $(LIST_SRC:$(SRC)/%.c=$(OBJ)/%.o)
 
-OBJ		= $(addprefix $(OBJDIR),$(SRC:.c=.o))
+LIBFT = libft.a
+LIBFTPATH = ./libft/
+INC_LIBFTPATH  = $(LIBFTPATH)
 
-CC		= gcc
-CFLAGS	= -Wall -Wextra -Werror
+all: $(NAME)
 
-LIBFT	= ./libft/libft.a
-LIBINC	= -I./libft
-LIBLINK	= -L./libft -lft
-
-SRCDIR	= ./src/
-INCDIR	= ./includes/
-OBJDIR	= ./obj/
-
-all: obj libft $(NAME)
-
-obj:
-	mkdir -p $(OBJDIR)
-
-$(OBJDIR)%.o:$(SRCDIR)%.c
-	$(CC) $(CFLAGS) $(LIBINC) -I $(INCDIR) -o $@ -c $<
-
-libft: $(LIBFT)
-
-$(LIBFT):
-	make -C ./libft
-
-$(NAME): $(OBJ)
-	$(CC) $(LIBLINK) -o $(NAME) $(OBJ)
+$(NAME): $(LIST_SRC)
+	make -C $(LIBFTPATH)
+	gcc $(CFLAG) -I $(INC) -I $(INC_LIBFTPATH) $(LIST_SRC) -L$(LIBFTPATH) -lft -o $(NAME)
 
 clean:
-	rm -rf $(OBJDIR)
+	make clean -C $(LIBFTPATH)
+	rm -f  $(LIST_OBJ)
 
 fclean: clean
-	rm -rf $(NAME)
+	make fclean -C $(LIBFTPATH)
+	rm -f $(NAME)
 
 re: fclean all
