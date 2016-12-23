@@ -6,46 +6,51 @@
 #    By: tpasqual <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2016/11/07 19:36:40 by tpasqual          #+#    #+#              #
-#    Updated: 2016/12/22 12:10:26 by tpasqual         ###   ########.fr        #
+#    Updated: 2016/12/23 09:00:25 by tpasqual         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-.PHONY: all, clean, fclean, re
+NAME	= fillit 
 
-SRC_PATH = ./src/
-SRC_NAME = 	main.c\
-			file_checking.c\
-			insert_part.c\
-			linked_list.c\
-			process_grid.c
-LIBFT = libft.a
+SRC		= main.c\
+		  file_checking.c\
+		  insert_part.c\
+		  linked_list.c\
+		  process_grid.c
 
-OBJ = $(SRC_NAME:.c=.o)
+OBJ		= $(addprefix $(OBJDIR),$(SRC:.c=.o))
 
-INC_NAME = fillit.h
+CC		= gcc
+CFLAGS	= -Wall -Wextra -Werror
 
-NAME = fillit
+LIBFT	= ./libft/libft.a
+LIBINC	= -I./libft
+LIBLINK	= -L./libft -lft
 
-CC = gcc
-CFLAGS = -Wall -Werror -Wextra
+SRCDIR	= ./src/
+INCDIR	= ./includes/
+OBJDIR	= ./obj/
 
-SRC = $(addprefix $(SRC_PATH),$(SRC_NAME))
-INC = $(addprefix $(INC_PATH),$(INC_NAME))
+all: obj libft $(NAME)
 
-all: $(NAME)
+obj:
+	mkdir -p $(OBJDIR)
 
-$(NAME): $(SRC)
-	@$(CC) $(CFLAGS) -c $(SRC)
-	@$(CC) $(CFLAGS) $(SRC) -L$(SRC_PATH) -lft -o $(NAME)
-	@echo "Compilation success"
+$(OBJDIR)%.o:$(SRCDIR)%.c
+	$(CC) $(CFLAGS) $(LIBINC) -I $(INCDIR) -o $@ -c $<
+
+libft: $(LIBFT)
+
+$(LIBFT):
+	make -C ./libft
+
+$(NAME): $(OBJ)
+	$(CC) $(LIBLINK) -o $(NAME) $(OBJ)
 
 clean:
-	@rm -rf $(OBJ)
-	@echo "Delete .o"
+	rm -rf $(OBJDIR)
 
 fclean: clean
-	@rm -rf $(NAME)
-	@echo "Delete fillit"
+	rm -rf $(NAME)
 
 re: fclean all
-
